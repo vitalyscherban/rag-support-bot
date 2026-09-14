@@ -1,0 +1,5 @@
+# Core pipeline runs on the standard library alone; these are for production use.
+langchain-core>=0.3.0
+langchain-openai>=0.2.0
+tiktoken>=0.7.0
+pytest>=8.0.0
