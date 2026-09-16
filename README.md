@@ -242,8 +242,45 @@ if you may also cut the right chunk. See [docs/evaluation.md](docs/evaluation.md
 
 ---
 
+## Azure deployment
+
+For production deployments the bot maps onto Azure managed services with no code
+changes — only environment variable swaps:
+
+| Local component | Azure equivalent |
+|---|---|
+| OpenAI API | Azure OpenAI Service (private VNet, compliance) |
+| In-memory vector store | Azure AI Search (hybrid keyword + vector) |
+| In-memory semantic cache | Azure Cache for Redis (HNSW vector index) |
+| Local corpus `*.md` | Azure Blob Storage |
+| CLI ingestion | Azure Functions (Event Grid trigger) |
+| — | Azure Container Apps (bot hosting) |
+| — | Azure API Management (auth, rate limiting) |
+
+### Cost savings at scale
+
+The 88% token reduction translates directly to AI generation cost. Based on
+Azure OpenAI pricing ($2.50/M GPT-4o input, $0.15/M GPT-4o-mini input):
+
+| Deployment size | Naive cost/mo | Optimized cost/mo | Saving |
+|---|---|---|---|
+| 2,000 queries/day | $241 | $2.44 | **99%** |
+| 10,000 queries/day | $1,208 | $12.15 | **99%** |
+| 50,000 queries/day | $6,039 | $60.70 | **99%** |
+
+Azure infrastructure (AI Search + Redis + Container Apps + APIM) adds a fixed
+~$160/month. At 2,000 queries/day the total bill drops from **$401/mo to
+$162/mo** (60% reduction); at 10,000 queries/day it drops from **$1,368/mo to
+$172/mo** (87% reduction).
+
+See **[docs/azure-architecture.md](docs/azure-architecture.md)** for the full
+solution diagram, request flow, ingestion pipeline, and per-lever cost breakdown.
+
+---
+
 ## Documentation
 
+* **[docs/azure-architecture.md](docs/azure-architecture.md)** — Azure solution diagram, cost analysis, infrastructure sizing
 * **[docs/architecture.md](docs/architecture.md)** — full design, all diagrams, module map
 * **[docs/tuning.md](docs/tuning.md)** — every knob, what it trades, how to find the floor
 * **[docs/evaluation.md](docs/evaluation.md)** — how the numbers are measured and what they mean
